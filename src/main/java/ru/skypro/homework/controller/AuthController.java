@@ -1,40 +1,40 @@
 package ru.skypro.homework.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
-import ru.skypro.homework.service.AuthService;
 
-@Slf4j
-@CrossOrigin(value = "http://localhost:3000")
+/**
+ * Контроллер для регистрации и авторизации пользователей.
+ */
 @RestController
-@RequiredArgsConstructor
+@Tag(name = "Авторизация", description = "Методы для регистрации и входа")
 public class AuthController {
 
-    private final AuthService authService;
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Login login) {
-        if (authService.login(login.getUsername(), login.getPassword())) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    @PostMapping("/register")
+    @Operation(summary = "Регистрация пользователя", responses = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<Void> register(@RequestBody Register register) {
+        // TODO: Здесь будет логика регистрации на Этапе III
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Register register) {
-        if (authService.register(register)) {
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    @PostMapping("/login")
+    @Operation(summary = "Авторизация пользователя", responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<Void> login(@RequestBody Login login) {
+        // TODO: Здесь будет логика логина на Этапе III
+        return ResponseEntity.ok().build();
     }
 }
