@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: roman
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "user2@gmail.com"
+              - column:
+                  name: password
+                  value: "$2a$10$xfOU7aVvaeMtgSYJ0Bl3BusNQwnjpEH2FmBMgVC4sxyVEdi92NhqC"
+              - column:
+                  name: first_name
+                  value: "Petr"
+              - column:
+                  name: last_name
+                  value: "Petrov"
+              - column:
+                  name: phone
+                  value: "+7(888)888-88-88"
+              - column:
+                  name: role
+                  value: "USER"

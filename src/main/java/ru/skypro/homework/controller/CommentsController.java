@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.Comment;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
+import ru.skypro.homework.service.CommentService;
 
 /**
  * Контроллер для работы с комментариями.
@@ -17,6 +18,12 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 @Tag(name = "Комментарии", description = "Методы для работы с комментариями")
 public class CommentsController {
 
+    private final CommentService commentService;
+
+    public CommentsController(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
     @GetMapping("/{id}/comments")
     @Operation(summary = "Получение комментариев объявления", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -24,8 +31,7 @@ public class CommentsController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Comments> getComments(@PathVariable("id") Integer id) {
-        // TODO: Логика получения комментариев
-        return ResponseEntity.ok(new Comments());
+        return ResponseEntity.ok(commentService.getComments(id));
     }
 
     @PostMapping("/{id}/comments")
@@ -36,8 +42,7 @@ public class CommentsController {
     })
     public ResponseEntity<Comment> addComment(@PathVariable("id") Integer id,
                                               @RequestBody CreateOrUpdateComment comment) {
-        // TODO: Логика добавления комментария
-        return ResponseEntity.ok(new Comment());
+        return ResponseEntity.ok(commentService.addComment(id, comment));
     }
 
     @DeleteMapping("/{adId}/comments/{commentId}")
@@ -49,7 +54,7 @@ public class CommentsController {
     })
     public ResponseEntity<Void> deleteComment(@PathVariable("adId") Integer adId,
                                               @PathVariable("commentId") Integer commentId) {
-        // TODO: Логика удаления комментария
+        commentService.deleteComment(adId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -63,7 +68,6 @@ public class CommentsController {
     public ResponseEntity<Comment> updateComment(@PathVariable("adId") Integer adId,
                                                  @PathVariable("commentId") Integer commentId,
                                                  @RequestBody CreateOrUpdateComment comment) {
-        // TODO: Логика обновления комментария
-        return ResponseEntity.ok(new Comment());
+        return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment));
     }
 }
