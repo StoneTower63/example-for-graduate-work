@@ -1,5 +1,7 @@
 package ru.skypro.homework.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +14,7 @@ import ru.skypro.homework.dto.Ad;
 import ru.skypro.homework.dto.Ads;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ExtendedAd;
+import ru.skypro.homework.service.AdService;
 
 /**
  * Контроллер для работы с объявлениями.
@@ -21,13 +24,18 @@ import ru.skypro.homework.dto.ExtendedAd;
 @Tag(name = "Объявления", description = "Методы для работы с объявлениями")
 public class AdsController {
 
+    private final AdService adService;
+
+    public AdsController(AdService adService) {
+        this.adService = adService;
+    }
+
     @GetMapping
     @Operation(summary = "Получение всех объявлений", responses = {
             @ApiResponse(responseCode = "200", description = "OK")
     })
     public ResponseEntity<Ads> getAllAds() {
-        // TODO: Логика получения списка объявлений
-        return ResponseEntity.ok(new Ads());
+        return ResponseEntity.ok(adService.getAllAds());
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -35,10 +43,12 @@ public class AdsController {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Ad> addAd(@RequestPart("properties") CreateOrUpdateAd properties,
-                                    @RequestPart("image") MultipartFile image) {
-        // TODO: Логика сохранения объявления
-        return ResponseEntity.status(HttpStatus.CREATED).body(new Ad());
+    public ResponseEntity<Ad> addAd(
+            @RequestPart("properties") String propertiesJson,
+            @RequestPart("image") MultipartFile image) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        CreateOrUpdateAd properties = mapper.readValue(propertiesJson, CreateOrUpdateAd.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(adService.addAd(properties, image));
     }
 
     @GetMapping("/{id}")
@@ -48,8 +58,7 @@ public class AdsController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<ExtendedAd> getAds(@PathVariable("id") Integer id) {
-        // TODO: Логика получения объявления по id
-        return ResponseEntity.ok(new ExtendedAd());
+        return ResponseEntity.ok(adService.getAds(id));
     }
 
     @DeleteMapping("/{id}")
@@ -60,7 +69,7 @@ public class AdsController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Void> removeAd(@PathVariable("id") Integer id) {
-        // TODO: Логика удаления объявления
+        adService.removeAd(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -73,8 +82,7 @@ public class AdsController {
     })
     public ResponseEntity<Ad> updateAds(@PathVariable("id") Integer id,
                                         @RequestBody CreateOrUpdateAd updateAd) {
-        // TODO: Логика обновления объявления
-        return ResponseEntity.ok(new Ad());
+        return ResponseEntity.ok(adService.updateAds(id, updateAd));
     }
 
     @GetMapping("/me")
@@ -83,8 +91,7 @@ public class AdsController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Ads> getAdsMe() {
-        // TODO: Логика получения объявлений текущего пользователя
-        return ResponseEntity.ok(new Ads());
+        return ResponseEntity.ok(adService.getAdsMe());
     }
 
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -96,7 +103,6 @@ public class AdsController {
     })
     public ResponseEntity<byte[]> updateImage(@PathVariable("id") Integer id,
                                               @RequestPart("image") MultipartFile image) {
-        // TODO: Логика обновления картинки
-        return ResponseEntity.ok(new byte[0]);
+        return ResponseEntity.ok(adService.updateImage(id, image));
     }
 }

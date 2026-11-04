@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
+import ru.skypro.homework.service.UserService;
 
 /**
  * Контроллер для управления профилем пользователя.
@@ -18,6 +19,12 @@ import ru.skypro.homework.dto.User;
 @Tag(name = "Пользователи", description = "Методы для работы с профилем пользователя")
 public class UserController {
 
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostMapping("/set_password")
     @Operation(summary = "Обновление пароля", responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -25,7 +32,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     public ResponseEntity<Void> setPassword(@RequestBody NewPassword newPassword) {
-        // TODO: Логика смены пароля будет на Этапе III
+        userService.setPassword(newPassword);
         return ResponseEntity.ok().build();
     }
 
@@ -35,8 +42,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<User> getUser() {
-        // TODO: Логика получения профиля будет на Этапе III
-        return ResponseEntity.ok(new User());
+        return ResponseEntity.ok(userService.getUser());
     }
 
     @PatchMapping("/me")
@@ -45,8 +51,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<UpdateUser> updateUser(@RequestBody UpdateUser updateUser) {
-        // TODO: Логика обновления профиля будет на Этапе III
-        return ResponseEntity.ok(new UpdateUser());
+        return ResponseEntity.ok(userService.updateUser(updateUser));
     }
 
     @PatchMapping("/me/image")
