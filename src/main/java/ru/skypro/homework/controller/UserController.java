@@ -60,7 +60,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Void> updateUserImage(@RequestParam("image") MultipartFile image) {
-        // TODO: Логика загрузки аватара будет на Этапе IV
+        userService.updateUserImage(image);
         return ResponseEntity.ok().build();
     }
 }
