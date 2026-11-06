@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import java.io.IOException;
 /**
  * Реализация сервиса для работы с профилем пользователя.
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -44,12 +46,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void setPassword(NewPassword newPassword) {
+        log.info("Запрос на смену пароля для пользователя");
         UserEntity user = getCurrentUser();
         if (!passwordEncoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
+            log.warn("Неверный текущий пароль для пользователя {}", user.getEmail());
             throw new RuntimeException("Неверный текущий пароль");
         }
         user.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
         userRepository.save(user);
+        log.info("Пароль успешно изменен для пользователя {}", user.getEmail());
     }
 
     @Override
@@ -60,16 +65,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUser updateUser(UpdateUser updateUser) {
+        log.info("Обновление профиля пользователя");
         UserEntity user = getCurrentUser();
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
         user.setPhone(updateUser.getPhone());
         userRepository.save(user);
+        log.info("Профиль пользователя {} обновлен", user.getEmail());
         return updateUser;
     }
 
     @Override
     public void updateUserImage(MultipartFile image) {
+        log.info("Обновление аватара пользователя");
         UserEntity user = getCurrentUser();
         try {
             if (user.getImage() != null) {
@@ -78,7 +86,9 @@ public class UserServiceImpl implements UserService {
             String fileName = imageService.saveImage(image);
             user.setImage(fileName);
             userRepository.save(user);
+            log.info("Аватар пользователя {} обновлен", user.getEmail());
         } catch (IOException e) {
+            log.error("Ошибка при сохранении аватара", e);
             throw new RuntimeException("Ошибка при сохранении картинки", e);
         }
     }
