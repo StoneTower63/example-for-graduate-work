@@ -9,5 +9,9 @@ import java.util.Optional;
  * Репозиторий для работы с пользователями.
  */
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+
     Optional<UserEntity> findByEmail(String email);
+
+    Optional<UserEntity> findByEmailIgnoreCase(String email);
+
 }
