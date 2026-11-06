@@ -16,6 +16,8 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ExtendedAd;
 import ru.skypro.homework.service.AdService;
 
+import javax.validation.Valid;
+
 /**
  * Контроллер для работы с объявлениями.
  */
@@ -81,7 +83,7 @@ public class AdsController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Ad> updateAds(@PathVariable("id") Integer id,
-                                        @RequestBody CreateOrUpdateAd updateAd) {
+                                        @Valid @RequestBody CreateOrUpdateAd updateAd) {
         return ResponseEntity.ok(adService.updateAds(id, updateAd));
     }
 

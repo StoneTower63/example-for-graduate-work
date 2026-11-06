@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Реализация сервиса для работы с комментариями.
  */
+@Slf4j
 @Service
 public class CommentServiceImpl implements CommentService {
 
@@ -57,6 +59,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment addComment(Integer id, CreateOrUpdateComment comment) {
+        log.info("Добавление комментария к объявлению с id: {}", id);
         UserEntity user = getCurrentUser();
         AdEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
@@ -67,30 +70,37 @@ public class CommentServiceImpl implements CommentService {
         commentEntity.setCreatedAt(System.currentTimeMillis());
 
         CommentEntity savedComment = commentRepository.save(commentEntity);
+        log.info("Комментарий создан с id: {}", savedComment.getPk());
         return commentMapper.toDto(savedComment);
     }
 
     @Override
     public void deleteComment(Integer adId, Integer commentId) {
+        log.info("Удаление комментария с id: {}", commentId);
         CommentEntity comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Комментарий не найден"));
         UserEntity user = getCurrentUser();
         if (!comment.getAuthor().getId().equals(user.getId())) {
+            log.warn("Попытка удаления чужого комментария пользователем {}", user.getEmail());
             throw new RuntimeException("Нет прав на удаление этого комментария");
         }
         commentRepository.delete(comment);
+        log.info("Комментарий с id: {} удален", commentId);
     }
 
     @Override
     public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateComment comment) {
+        log.info("Обновление комментария с id: {}", commentId);
         CommentEntity commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Комментарий не найден"));
         UserEntity user = getCurrentUser();
         if (!commentEntity.getAuthor().getId().equals(user.getId())) {
+            log.warn("Попытка редактирования чужого комментария пользователем {}", user.getEmail());
             throw new RuntimeException("Нет прав на редактирование этого комментария");
         }
         commentEntity.setText(comment.getText());
         CommentEntity updatedComment = commentRepository.save(commentEntity);
+        log.info("Комментарий с id: {} обновлен", commentId);
         return commentMapper.toDto(updatedComment);
     }
 }

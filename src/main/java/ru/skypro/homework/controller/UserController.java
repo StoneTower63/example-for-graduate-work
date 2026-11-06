@@ -11,6 +11,8 @@ import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
 import ru.skypro.homework.service.UserService;
 
+import javax.validation.Valid;
+
 /**
  * Контроллер для управления профилем пользователя.
  */
@@ -31,7 +33,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public ResponseEntity<Void> setPassword(@RequestBody NewPassword newPassword) {
+    public ResponseEntity<Void> setPassword(@Valid @RequestBody NewPassword newPassword) {
         userService.setPassword(newPassword);
         return ResponseEntity.ok().build();
     }
@@ -50,7 +52,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<UpdateUser> updateUser(@RequestBody UpdateUser updateUser) {
+    public ResponseEntity<UpdateUser> updateUser(@Valid @RequestBody UpdateUser updateUser) {
         return ResponseEntity.ok(userService.updateUser(updateUser));
     }
 

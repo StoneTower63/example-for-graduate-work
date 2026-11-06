@@ -3,6 +3,7 @@ package ru.skypro.homework.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,22 +11,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.service.AuthService;
+
+import javax.validation.Valid;
 
 /**
  * Контроллер для регистрации и авторизации пользователей.
  */
 @RestController
+@RequiredArgsConstructor
 @Tag(name = "Авторизация", description = "Методы для регистрации и входа")
 public class AuthController {
+
+    private final AuthService authService;
 
     @PostMapping("/register")
     @Operation(summary = "Регистрация пользователя", responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
-    public ResponseEntity<Void> register(@RequestBody Register register) {
-        // TODO: Здесь будет логика регистрации на Этапе III
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Void> register(@Valid @RequestBody Register register) {
+        if (authService.register(register)) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @PostMapping("/login")
@@ -33,8 +42,10 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<Void> login(@RequestBody Login login) {
-        // TODO: Здесь будет логика логина на Этапе III
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> login(@Valid @RequestBody Login login) {
+        if (authService.login(login.getUsername(), login.getPassword())) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

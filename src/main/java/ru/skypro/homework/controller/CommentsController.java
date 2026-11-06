@@ -10,6 +10,8 @@ import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
+import javax.validation.Valid;
+
 /**
  * Контроллер для работы с комментариями.
  */
@@ -41,7 +43,7 @@ public class CommentsController {
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<Comment> addComment(@PathVariable("id") Integer id,
-                                              @RequestBody CreateOrUpdateComment comment) {
+                                              @Valid @RequestBody CreateOrUpdateComment comment) {
         return ResponseEntity.ok(commentService.addComment(id, comment));
     }
 
@@ -67,7 +69,7 @@ public class CommentsController {
     })
     public ResponseEntity<Comment> updateComment(@PathVariable("adId") Integer adId,
                                                  @PathVariable("commentId") Integer commentId,
-                                                 @RequestBody CreateOrUpdateComment comment) {
+                                                 @Valid @RequestBody CreateOrUpdateComment comment) {
         return ResponseEntity.ok(commentService.updateComment(adId, commentId, comment));
     }
 }
