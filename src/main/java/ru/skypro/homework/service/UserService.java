@@ -14,5 +14,5 @@ public interface UserService {
 
     UpdateUser updateUser(UpdateUser updateUser);
 
-    void updateUserImage(String imagePath);
+    void updateUserImage(org.springframework.web.multipart.MultipartFile image);
 }

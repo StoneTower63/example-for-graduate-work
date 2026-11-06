@@ -4,13 +4,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
+
+import java.io.IOException;
 
 /**
  * Реализация сервиса для работы с профилем пользователя.
@@ -21,11 +25,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
+                           PasswordEncoder passwordEncoder, ImageService imageService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.imageService = imageService;
     }
 
     private UserEntity getCurrentUser() {
@@ -62,9 +69,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserImage(String imagePath) {
+    public void updateUserImage(MultipartFile image) {
         UserEntity user = getCurrentUser();
-        user.setImage(imagePath);
-        userRepository.save(user);
+        try {
+            if (user.getImage() != null) {
+                imageService.deleteImage(user.getImage());
+            }
+            String fileName = imageService.saveImage(image);
+            user.setImage(fileName);
+            userRepository.save(user);
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при сохранении картинки", e);
+        }
     }
 }
